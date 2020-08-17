@@ -1,18 +1,17 @@
 %% read_spursi_flux
 %
 % Read computed air-sea fluxes from the SPURS-I mooring
-% Average the time series in one-hour and three-hours intervals
+% Average the time series in one-hour intervals
 %
-% Averaged data are saved as 'spursi_flux_1hrUOP.mat' and
-%  'spursi_flux_3hrUOP.mat', respectively
+% Averaged data are saved as 'spursi_flux_1hrUOP.mat'
 %
 % Zhihua Zheng, University of Washington, July 17 2019
 % =========================================================================
 
 %% General setting
 
-root_dir = '~/GDrive/UW/Research/Data/';
-Met_dir = [root_dir,'SPURSI/Met/'];
+data_dir = './data/';
+Met_dir  = [data_dir,'SPURSI/Met/'];
 
 % hourly meterological variables and fluxes
 Mname  = fullfile(Met_dir,'SPURS_2012_D_M_1hr.nc');
@@ -81,21 +80,22 @@ SF1.dahr = datenum(datm_hr)*24; % in hours
 % eliminate empty bin
 SF = SF1(1:end-1,:);
 
-save([root_dir,'SPURSI/spursi_flux_1hrUOP.mat'],'SF');
+save([data_dir,'SPURSI/spursi_flux_1hrUOP.mat'],'SF');
+clear
 
 %% 3-hourly average
 
-% bin edges and center
-tlower = dateshift(datm(1),  'start','day');
-tupper = dateshift(datm(end),'end',  'day');
-datm3E = (tlower:hours(3):tupper)';
-datm_3hr = datm3E + hours(1) + minutes(30);
-
-SF3 = retime(sf,datm3E,@mean);
-SF3.datm = datm_3hr;
-SF3.dahr = datenum(datm_3hr)*24; % in hours
-
-% eliminate bins with more/less than 3 data points for 3-hour average
-SF = SF3(8:3051,:);
-
-save([root_dir,'SPURSI/spursi_flux_3hrUOP.mat'],'SF');
+% % bin edges and center
+% tlower = dateshift(datm(1),  'start','day');
+% tupper = dateshift(datm(end),'end',  'day');
+% datm3E = (tlower:hours(3):tupper)';
+% datm_3hr = datm3E + hours(1) + minutes(30);
+% 
+% SF3 = retime(sf,datm3E,@mean);
+% SF3.datm = datm_3hr;
+% SF3.dahr = datenum(datm_3hr)*24; % in hours
+% 
+% % eliminate bins with more/less than 3 data points for 3-hour average
+% SF = SF3(8:3051,:);
+% 
+% save([data_dir,'SPURSI/spursi_flux_3hrUOP.mat'],'SF');

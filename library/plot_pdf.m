@@ -32,7 +32,7 @@ set(gca,'TickDir','out','fontsize',12)
 ax = gca;
 ax.Position = ax.Position + off_ratio*[1 1 -1 -1];
 ylh = ylabel('Normalized PDF','fontsize',16);
-xlh = xlabel(xString,'fontsize',16);
+xlh = xlabel(xString,'fontsize',16,'Interpreter','tex');
 xlh.Units = 'Normalized';
 ylh.Units = 'Normalized';
 set(xlh,'Position',xlh.Position + [0 -off_ratio/6 0]);

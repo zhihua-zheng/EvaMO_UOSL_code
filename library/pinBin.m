@@ -96,7 +96,7 @@ S.dof(S.dof <= 0) = NaN;
 
 % critical vlaues for Student's distribution
 S.tupp = tinv(alpU,S.dof);
-% S.tlow = tinv(alpL,S.dof);
+S.tlow = tinv(alpL,S.dof);
 
 S.qerr = S.tupp .* S.qstd ./ sqrt(S.dof); % symmetric confidence limits
 

@@ -43,6 +43,8 @@ stage(Texf > 10*Tturnover) = 1;
 
 %% Show quasi-steady state periods
 
+if iD == 2
+
 figure('position',[0 0 900 600]);
 [hax,~] = tight_subplot(2,1,[.03 .02],[.1 .05],[.1 .1]);
 
@@ -101,3 +103,4 @@ legend('external forcing','boundary layer eddy * 10','fontsize',16,...
        'location','north')
    
 set(hax,'TickDir','out')
+end

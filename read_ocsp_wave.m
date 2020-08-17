@@ -1,14 +1,13 @@
 function read_ocsp_wave(cGotm_in)
 %
 % Read directional wave spectrum data from the OCSP mooring
-% Average the time series in one-hour and three-hours intervals
+% Average the time series in one-hour intervals
 %
 % cGotm_in: option to create input files for GOTM simulation
 %  1 - true
 %  0 - false
 %
-% Averaged data are saved as 'ocsp_wave_1hr.mat' and
-%  'ocsp_wave_3hr.mat', respectively
+% Averaged data are saved as 'ocsp_wave_1hr.mat'
 %
 % Zhihua Zheng, University of Washington, August 13 2018
 %
@@ -19,13 +18,13 @@ function read_ocsp_wave(cGotm_in)
 
 %% General setting
 
-root_dir = '~/GDrive/UW/Research/Data/';
-Wave_dir = [root_dir,'Papa/Wave'];
-Met_dir  = [root_dir,'Papa/Met'];
+data_dir = './data/';
+Wave_dir = [data_dir,'Papa/Wave'];
+Met_dir  = [data_dir,'Papa/Met'];
 
 DWSname  = fullfile(Wave_dir,'166p1_historic.nc');
 WINDname = fullfile(Met_dir, 'w50n145w_hr.cdf');
-PROFname = fullfile(root_dir,'Papa/ocsp_prof_1hrPMEL.mat');
+PROFname = fullfile(data_dir,'Papa/ocsp_prof_1hrPMEL.mat');
 
 %% Read variables 
 
@@ -132,24 +131,24 @@ SD1.dahr = datenum(datm_hr)*24; % in hours
 % remove empty bins
 SD = SD1(2:end-1,:);
 
-save([root_dir,'Papa/ocsp_wave_1hr.mat'],'SD','zSt');
+save([data_dir,'Papa/ocsp_wave_1hr.mat'],'SD','zSt');
 
 %% 3-Hour average
 
-% bin edges and center
-tlower   = dateshift(datm(1),  'start','day');
-tupper   = dateshift(datm(end),'end',  'day');
-datm_3hr = (tlower:hours(3):tupper)';
-datm3E   = datm_3hr - hours(1) - minutes(30);
-
-SD3 = retime(sd,datm3E,'mean');
-SD3.datm = datm_3hr;
-SD3.dahr = datenum(datm_3hr)*24; % in hours
-
-% eliminate bins with more/less than 3 data points for 3-hour average
-SD = SD3(7:end-8,:);
-
-save([root_dir,'Papa/ocsp_wave_3hr.mat'],'SD','zSt');
+% % bin edges and center
+% tlower   = dateshift(datm(1),  'start','day');
+% tupper   = dateshift(datm(end),'end',  'day');
+% datm_3hr = (tlower:hours(3):tupper)';
+% datm3E   = datm_3hr - hours(1) - minutes(30);
+% 
+% SD3 = retime(sd,datm3E,'mean');
+% SD3.datm = datm_3hr;
+% SD3.dahr = datenum(datm_3hr)*24; % in hours
+% 
+% % eliminate bins with more/less than 3 data points for 3-hour average
+% SD = SD3(7:end-8,:);
+% 
+% save([data_dir,'Papa/ocsp_wave_3hr.mat'],'SD','zSt');
 
 %% GOTM input file
 

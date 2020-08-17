@@ -14,8 +14,8 @@ function read_ocsp_TS(cGotm_in)
 
 %% General setting
 
-root_dir = '~/GDrive/UW/Research/Data/';
-TS_dir   = [root_dir,'Papa/TS/'];
+data_dir = './data/';
+TS_dir   = [data_dir,'Papa/TS/'];
 
 Tname = fullfile(TS_dir,'t50n145w_hr.cdf');
 Sname = fullfile(TS_dir,'s50n145w_hr.cdf');
@@ -91,7 +91,7 @@ NSQprof = center_diff(Bprof,-depth_t',2,'mid');
 
 PROF = timetable(datm,dahr,PTprof,SAprof,PDprof,Bprof,NSQprof);
 
-save([root_dir,'Papa/ocsp_prof_1hrPMEL.mat'],'depth_t','depth_s','PROF');
+save([data_dir,'Papa/ocsp_prof_1hrPMEL.mat'],'depth_t','depth_s','PROF');
 
 %% GOTM input files
 

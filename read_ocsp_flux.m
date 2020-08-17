@@ -1,25 +1,24 @@
 function read_ocsp_flux(cGotm_in)
 %
 % Read computed air-sea fluxes from the OCSP mooring
-% Average the time series in one-hour and three-hours intervals
+% Average the time series in one-hour intervals
 %
 % cGotm_in: option to create input files for GOTM simulation
 %  1 - true
 %  0 - false
 %
-% Averaged data are saved as 'ocsp_flux_1hrPMEL.mat' and
-%  'ocsp_flux_3hrPMEL.mat', respectively
+% Averaged data are saved as 'ocsp_flux_1hrPMEL.mat'
 %
-% Note: sensible heat flux due to Rain is not included
+% Note: sensible heat flux due to rain is not included
 %
 % Zhihua Zheng, University of Washington, July 15 2019
 % =========================================================================
 
 %% General setting
 
-root_dir = '~/GDrive/UW/Research/Data/';
-Met_dir  = [root_dir,'Papa/Met/'];
-TS_dir   = [root_dir,'Papa/TS/'];
+data_dir = './data/';
+Met_dir  = [data_dir,'Papa/Met/'];
+TS_dir   = [data_dir,'Papa/TS/'];
 
 TAUname = fullfile(Met_dir,'tau50n145w_hr.cdf');
 NSWname = fullfile(Met_dir,'swnet50n145w_hr.cdf');
@@ -155,7 +154,7 @@ tsst  = datenum(2007,6,8,0,0,0) + tsst/24;
 tsss  = datenum(2007,6,8,0,0,0) + tsss/24;
 tart  = datenum(2007,6,8,0,0,0) + tart/24;
 twin  = datenum(2007,6,8,4,0,0) + twin/24;
-twin  = round(twin*24*3600)/24/3600; % round to nerest second
+twin  = round(twin*24*3600)/24/3600; % round to nearest second
 
 dahr  = 24*time; % in hours
 datm  = datetime(time, 'ConvertFrom','datenum');
@@ -192,7 +191,7 @@ u10  = spshfttc(wspd,zwin,10,art);
 SF = timetable(datm,dahr,...
      tau_x,tau_y,tau,u10,nsw,nlw,hlb,hsb,evap,rain,sst,sss);
 
-save([root_dir,'Papa/ocsp_flux_1hrPMEL.mat'],'SF');
+save([data_dir,'Papa/ocsp_flux_1hrPMEL.mat'],'SF');
 
 %% GOTM input files
 

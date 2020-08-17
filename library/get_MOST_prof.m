@@ -33,22 +33,6 @@ function PTmost = get_MOST_prof(z,zdum,sst,Tstar,zeta,fop)
 %==========================================================================
 
 [~,ntm] = size(zeta);
-
-% Use fine resolution for integration between each level of z
-% This integration assumes depth independent Tstar, MOL
-% MOL = abs(z) ./ zeta;
-% cdPTmost = zeros(nz,ntm); % accumulative dPT
-% for i = 2:nz
-%     
-%     iz = linspace(z(1),z(i))';
-%     izeta = abs(iz) ./ repmat(MOL(1,:),100,1);
-%     iTstar = repmat(Tstar(1,:),100,1);
-%     phi_dum = get_emp_phi(izeta,fop);
-%     
-%     intgrd = iTstar ./ abs(iz) .* phi_dum;
-%     cdPTmost(i,:) = trapz(iz,intgrd);
-% end
-
 phi_dum = get_emp_phi(zeta,fop);
 intgrd  = Tstar ./ abs(zdum) .* phi_dum;
 

@@ -12,12 +12,12 @@ mkrNum{2} = '(d)';
 
 rObs  = rpData.rObs;  
 rMOi  = rpData.rMOi;
-zml   = rpData.zml;
+zbl   = rpData.zbl;
 Iprof = rpData.Iprof;
 
 %% Preprocessing
 
-tmp1 = zml(:,Iprof);
+tmp1 = zbl(:,Iprof);
 tmp2 = rObs(:,Iprof);
 tmp3 = rMOi(:,Iprof);
 

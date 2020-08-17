@@ -84,7 +84,7 @@ phiM = nan(size(zeta));
 phiS = nan(size(zeta));
 
 fun = @SMCse_phiEq_nol;
-options = optimovtions('fsolve',...'Algorithm','Levenberg-Marquardt',...
+options = optimoptions('fsolve',...'Algorithm','Levenberg-Marquardt',...
                        'Display','off');
 
 for i = 1:nzet

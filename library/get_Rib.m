@@ -26,9 +26,7 @@ function Ribprof = get_Rib(Bprof,Ustar,z)
 
 %% Presetting
 
-MOconsts_name = '~/GDrive/UW/Research/Data/Misce/MO_consts.mat';
-load(MOconsts_name,'kappa');
-
+kappa = 0.4;
 nz  = length(z);
 ntm = length(Ustar);
 
@@ -49,4 +47,3 @@ N2 = del_B ./ repmat(del_z,1,ntm);
 Ribprof = N2 ./ S2;
 
 end
-

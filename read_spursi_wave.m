@@ -1,10 +1,9 @@
 %% read_spursi_wave
 %
 % Read directional wave spectrum data from the SPURS-I mooring
-% Average the time series in one-hour and three-hours intervals
+% Average the time series in one-hour intervals
 %
-% Averaged data are saved as 'spursi_wave_1hr.mat' and
-%  'spursi_wave_3hr.mat', respectively
+% Averaged data are saved as 'spursi_wave_1hr.mat'
 %
 % Zhihua Zheng, University of Washington, July 30 2019
 %
@@ -15,12 +14,12 @@
 
 %% General setting
 
-root_dir = '~/GDrive/UW/Research/Data/';
-Wave_dir = [root_dir,'SPURSI/Wave/'];
-Met_dir  = [root_dir,'SPURSI/Met/'];
+data_dir = './data/';
+Wave_dir = [data_dir,'SPURSI/Wave/'];
+Met_dir  = [data_dir,'SPURSI/Met/'];
 
 Mname    = fullfile(Met_dir, 'SPURS_2012_D_M_1hr.nc');
-PROFname = fullfile(root_dir,'SPURSI/spursi_prof_1hrBox.mat');
+PROFname = fullfile(data_dir,'SPURSI/spursi_prof_1hrBox.mat');
 
 %% Load data
 
@@ -120,22 +119,23 @@ SD1.dahr = datenum(datm_hr)*24; % in hours
 % remove empty bin
 SD = SD1(1:end-1,:);
 
-save([root_dir,'SPURSI/spursi_wave_1hr.mat'],'SD','zSt');
+save([data_dir,'SPURSI/spursi_wave_1hr.mat'],'SD','zSt');
+clear
 
 %% 3-Hour average
 
-% bin edges and center
-tlower = dateshift(datm(1),  'start','day');
-tupper = dateshift(datm(end),'end',  'day');
-datm3E = (tlower:hours(3):tupper)';
-datm_3hr = datm3E + hours(1) + minutes(30);
-
-% use 'mean' as there are some gaps in time series (e.g. Jan-31-0000 2013)
-SD3 = retime(sd,datm3E,'mean');
-SD3.datm = datm_3hr;
-SD3.dahr = datenum(datm_3hr)*24; % in hours
-
-% eliminate bins with more/less than 3 data points for 3-hour average
-SD = SD3(5:3060,:);
-
-save([root_dir,'SPURSI/spursi_wave_3hr.mat'],'SD','zSt');
+% % bin edges and center
+% tlower = dateshift(datm(1),  'start','day');
+% tupper = dateshift(datm(end),'end',  'day');
+% datm3E = (tlower:hours(3):tupper)';
+% datm_3hr = datm3E + hours(1) + minutes(30);
+% 
+% % use 'mean' as there are some gaps in time series (e.g. Jan-31-0000 2013)
+% SD3 = retime(sd,datm3E,'mean');
+% SD3.datm = datm_3hr;
+% SD3.dahr = datenum(datm_3hr)*24; % in hours
+% 
+% % eliminate bins with more/less than 3 data points for 3-hour average
+% SD = SD3(5:3060,:);
+% 
+% save([data_dir,'SPURSI/spursi_wave_3hr.mat'],'SD','zSt');

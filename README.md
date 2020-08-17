@@ -5,8 +5,8 @@
 You can reach me at [zhihua@uw.edu](mailto:zhihua@uw.edu) for questions related to the usage of this code. 
 
 ### Description
-This set of scripts fufills three stages in generating the results presented in the paper:
-- Load and process raw data
+This set of scripts fufills the analysis presented in the paper in three steps:
+- Load and process original data
 - Calculate key parameters
 - Produce figures
 
@@ -14,21 +14,37 @@ This set of scripts fufills three stages in generating the results presented in 
 This code is tested in MATLAB R2019b.
 
 It also uses some external toolboxes/functions, as listed below:
-- [Gibbs-SeaWater (GSW) Oceanographic Toolbox'](http://www.teos-10.org/software.htm)
+- [Gibbs-SeaWater (GSW) Oceanographic Toolbox](http://www.teos-10.org/software.htm)
 - [Air-sea toolbox](https://github.com/sea-mat/air-sea)
 - [cbrewer](https://www.mathworks.com/matlabcentral/fileexchange/34087-cbrewer-colorbrewer-schemes-for-matlab)
-- [RGB](https://www.mathworks.com/matlabcentral/fileexchange/24497-rgb-triple-of-color-name-version-2) triple of color name
+- [Custom Colormap](https://www.mathworks.com/matlabcentral/fileexchange/69470-custom-colormap)
+- [RGB](https://www.mathworks.com/matlabcentral/fileexchange/24497-rgb-triple-of-color-name-version-2)
+- [Marke​rTransparency](https://www.mathworks.com/matlabcentral/fileexchange/65194-peterrochford-markertransparency)
+- [suplabel](https://www.mathworks.com/matlabcentral/fileexchange/7772-suplabel)
+- [tight_subplot](https://www.mathworks.com/matlabcentral/fileexchange/27991-tight_subplot-nh-nw-gap-marg_h-marg_w)
 
 ### Data
 The data used in this work are mostly publicly available (see the "Data availability statement" in our paper). For your convience, a copy of the original data can be downloaded either from [this Google Drive link](https://drive.google.com/file/d/13UYYOT9AXFufjMw6_wr4-hoNv7M3tT7v/view?usp=sharing), or from the most recent [release]() of this repository.
 
 ### Work flow
+1. Download this repository to your local computer. Alternatively, you can clone it using the command line in Terminal,
 
-### Reference
+```bash
+git clone https://github.com/zhihua-zheng/EvaMO_UOSL_code.git
+```
+Add this repository to your MATLAB search path
 
-* McDougall, T.J. and P.M. Barker, 2011: Getting started with TEOS-10 and the Gibbs Seawater (GSW) Oceanographic Toolbox, 28pp., SCOR/IAPSO WG127, ISBN 978-0-646-55621-5.
+```matlab
+addpath(genpath('<path to this repository>'))
+```
 
-* Charles, R. 2015: cbrewer : colorbrewer schemes for Matlab, MATLAB Central File Exchange. Retrieved May 26, 2019.
+2. Download the data file `EvaMO_UOSL_data.zip` as described in the [Data](#-data) section. Unzip it into the `EvaMO_UOSL_code` directory and rename the `EvaMO_UOSL_data` direcctory to `data`.
+
+3. 
+
+4.
+
+
 
 Functions for solving super-equilibirum model equations are in ./library
 ========================================================================

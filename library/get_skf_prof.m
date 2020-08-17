@@ -2,13 +2,13 @@ function [SKF,PROF,dprofT,dprofS,zSt,ziSt] = get_skf_prof(Lave,casename)
 
 %% Parsing inputs
 
-root_dir = '~/GDrive/UW/Research/Data/';
+data_dir = './data/';
 cLave = num2str(Lave);
 
 switch casename
     
     case 'Papa'
-        data_dir = [root_dir,'Papa/'];
+        data_dir = [data_dir,'Papa/'];
         PROFname = fullfile(data_dir,['ocsp_prof_',cLave,'hrPMEL.mat']);
         FLUXname = fullfile(data_dir,['ocsp_flux_',cLave,'hrPMEL.mat']);
         WAVEname = fullfile(data_dir,['ocsp_wave_',cLave,'hr.mat']);
@@ -17,7 +17,7 @@ switch casename
         ssp      = 1;
         
     case 'SPURSI'
-        data_dir = [root_dir,'SPURSI/'];
+        data_dir = [data_dir,'SPURSI/'];
         PROFname = fullfile(data_dir,['spursi_prof_',cLave,'hrBox.mat']);        
         FLUXname = fullfile(data_dir,['spursi_flux_',cLave,'hrUOP.mat']);
         WAVEname = fullfile(data_dir,['spursi_wave_',cLave,'hr.mat']);
@@ -91,8 +91,10 @@ SKF.Vseason(SKF.Isummer) = 4;
 
 %% Constants
 
-MOconsts_name = [root_dir,'Misce/MO_consts.mat'];
-load(MOconsts_name,'g','rho0','cp','kappa');
+g     = 9.81;
+rho0  = 1025;
+cp    = 3985;
+kappa = 0.4;
 
 %% Seawater expansion/contraction coefficients
 

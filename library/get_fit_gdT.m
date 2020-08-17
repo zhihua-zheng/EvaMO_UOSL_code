@@ -1,4 +1,4 @@
-function [gradT,PTfit] = get_fit_gdT(depth,WLD,PTprof,BLD,nFit,ishow)
+function [gradT,PTfit] = get_fit_gdT(depth,iD,PTprof,BLD,nFit,ishow)
 
 %% Pre-setting
 
@@ -25,11 +25,10 @@ for j = 1:ntm
     % number of measurements within surface layer
     iSLDj   = sum(depth <= SLD(j));
     nPTinSL = sum(~isnan(PTprof(1:mlim(2),j)));
-    iWLDj   = sum(depth <= WLD(j))+1;
     
     %% loop for regressions with varying points
 
-    if nPTinSL >= nFit && ~isnan(WLD(j))
+    if nPTinSL >= nFit
    
         p   = cell(1,nr);
         gof = cell(1,nr);
@@ -41,7 +40,7 @@ for j = 1:ntm
         
         for ir = 1:nr
         
-        Ifit = ~isnan(PTprof(1:m(ir),j));% & depth(1:m(ir)) > WLD(j);
+        Ifit = ~isnan(PTprof(1:m(ir),j));
         
         if sum(Ifit) >= 3
         [p{ir},gof{ir}] = fit(lnz(Ifit),PTprof(Ifit,j),'poly2');
@@ -87,16 +86,20 @@ for j = 1:ntm
             
             % close to SL base, gradient is small, susceptible to error
             nGrad   = min([M-1 iSLDj]);
-            Ieva    = depth(1:nGrad) > depth(1);% WLD(j);
+            Ieva    = depth(1:nGrad) > depth(1);
             d_eva   = depth(Ieva);
             lnz_eva = log(d_eva);
             gradT(Ieva,j) = -(2*b(1)*lnz_eva + b(2)) ./ d_eva;
             
             % fitted profile in surface layer
-            PTfit(iWLDj:iSLDj,j) = P(lnz(iWLDj:iSLDj));
+            PTfit(1:iSLDj,j) = P(lnz(1:iSLDj));
             
             % visualize polynomial regression
             if ishow
+                show_polyfit_lnz;
+            
+            % Figure 3 is from the SPURS-I dataset with j = 3427
+            elseif iD == 2 && j == 3427
                 show_polyfit_lnz;
             end
         end
@@ -152,8 +155,6 @@ function show_polyfit_lnz()
     ylh.Units = 'Normalized';
     set(xlh,'Position',xlh.Position + [0 -off_r 0]);
     set(ylh,'Position',ylh.Position + [off_r 0 0]);
-
-% demo_prof_fit_SP.png is from j = 3427
 end
 
 end

@@ -1,9 +1,25 @@
+%% evaMO_main
+
+%% Read original data
+
+read_ocsp_TS(0);
+read_ocsp_flux(0);
+read_ocsp_wave(0);
+
+read_spursi_TS;
+read_spursi_flux;
+read_spursi_wave;
+
+%% Process original data
+
+prep_ocsp;
+prep_spursi;
 
 %% Load processed datasets
 
-root_dir   = '~/GDrive/UW/Research/Data/';
-ocsp_dir   = [root_dir,'Papa/'];
-spursi_dir = [root_dir,'SPURSI/'];
+data_dir   = './data/';
+ocsp_dir   = [data_dir,'Papa/'];
+spursi_dir = [data_dir,'SPURSI/'];
 
 pzPA = load([ocsp_dir,  'ocsp_pzData.mat']);
 pzSP = load([spursi_dir,'spursi_pzData.mat']);
@@ -74,11 +90,12 @@ PZ_scat(pzSP,2,PZf,PZax(2),1);
 % figure;
 % plot(E6_list,slp,'-o'); grid on
 % optimal E6 is 2.4, with slp = 1
-save([spursi_dir,'spursi_slpE6.mat'],'E6_list','slp')
+% save([spursi_dir,'spursi_slpE6.mat'],'E6_list','slp')
 
 Lstarf = figure('position',[0 0 820 800]);
 [lsrAx,~] = tight_subplot(2,2,[.07 .02],[.07 .03],[.08 .03]);
 
+oE6 = 2.5;
 phi_lstar_E6(pzPA,1,oE6,lsrAx,1);
 phi_lstar_E6(pzSP,2,oE6,lsrAx,1);
 
@@ -88,11 +105,11 @@ xString = 'H_s [m]';
 plot_pdf(skfPA.SKF.SD.Hs(PAqs),skfSP.SKF.SD.Hs(SPqs),22,xString)
 xlim([0 10])
 
-xString = 'u_* [m/s]';
+xString = 'u_* [m s^{-1}]';
 plot_pdf(skfPA.SKF.Ustar(PAqs),skfSP.SKF.Ustar(SPqs),22,xString)
 xlim([0 0.04])
 
-xString = 'B_0 [m^2/s^3]';
+xString = 'B_0 [m^2 s^{-3}]';
 plot_pdf(skfPA.SKF.Bo(PAqs),skfSP.SKF.Bo(SPqs),42,xString)
 xlim([-6e-7 4e-7])
 

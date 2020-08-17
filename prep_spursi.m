@@ -5,20 +5,20 @@
 % Zhihua Zheng, University of Washington, July 18 2019
 % =========================================================================
 
-%%
+%% Constants
 
 clear
-Lave = 1; % length of averaging interval [hr]
+Lave = 1; % the length of averaging interval [hr]
+kappa = 0.4;
 
 %% Loading
 
 iD = 2;
 scat_mode = 1;
 dataName = 'SPURSI';
+data_dir = './data/';
+spursi_dir = [data_dir,'SPURSI/'];
 
-spursi_dir = '~/GDrive/UW/Research/Data/SPURSI/';
-MOconsts_name = '~/GDrive/UW/Research/Data/Misce/MO_consts.mat';
-load(MOconsts_name,'Rig_c','zeta_c','kappa','Rib_c');
 [SKF,PROF,depth_t,depth_s,zSt,ziSt] = get_skf_prof(Lave,dataName);
 
 %% observed profiles
@@ -62,32 +62,28 @@ Ribprof = get_Rib(Bprof,SKF.Ustar',-depth_t);
 % plot(Rib_c_list,BLD_rmse,'-o'); grid on
 
 % 2.30 for 1.0MLD
-% 2.85 for 1.1MLD
-% 3.95 for 1.2MLD
 BLD = get_mld(flipud(Ribprof),-flipud(depth_t(2:end)),3,2.30);
 SLD = BLD*0.2;
 nL  = find(depth_t < max(SLD),1,'last');
 ziSt_SL = ziSt_up(1:find(ziSt_up == -depth_t(nL)));
 
-% position of SL sensor depth in ziSt_up
+% position of SL sensor depths in ziSt_up
 [~,Pct] = ismember(-depth_t(1:nL),ziSt_up);
 
-% indices of SL sensor depth in ziSt_up
+% indices of SL sensor depths in ziSt_up
 Ict = ismember(ziSt_up,-depth_t(1:nL));
 
-% indices of SL sensor depth in ziSt_SL
+% indices of SL sensor depths in ziSt_SL
 ISL_ct = ismember(ziSt_SL,-depth_t(1:nL));
 
 %% Polynomial fit of profiles in ln(|z|)
 
-WLD = SKF.SD.Hs*0;
-% [gdT_fit,PTfit] = get_fit_gdT(depth_t,WLD,PTprof,BLD,3,0);
-% save([spursi_root,'spursi_fitData.mat'],'gdT_fit','PTfit')
-load([spursi_dir,'spursi_fitData.mat'])
+[gdT_fit,PTfit] = get_fit_gdT(depth_t,iD,PTprof,BLD,3,0);
+save([spursi_dir,'spursi_fitData.mat'],'gdT_fit','PTfit')
 
 %% Surface proximity function
 
-Ls  = get_Ls(ziSt,BLD,SKF.dUStDw_dz,0.4);
+Ls  = get_Ls(ziSt,BLD,SKF.dUStDw_dz,kappa);
 fzS = 1 + tanh(ziSt/4./Ls);
 SKF.Ls = Ls';
 
@@ -141,8 +137,7 @@ dT_fit(ic,:) = PTfit(iu,:)  - PTfit(jl,:);
 dT_MOi(ic,:) = get_MOST_Delta(FS.Tstar,MOL,zz,fop);
 
 % only use data in the surface layer
-IinSL = -WLD' > zz(1) & ...
-        -SLD' < zz(2); % when both sensors are in surface layer
+IinSL = -SLD' < zz(2);
 dT_obs(ic,~IinSL) = NaN;
 dT_MOi(ic,~IinSL) = NaN;
     end
@@ -152,8 +147,8 @@ save([spursi_dir,'spursi_dTData.mat'],'dT_MOi','dT_fit','dT_obs')
 
 %% Temperature profiles for comparsion
 
-[rObs,rMOi,zml,Iprof] = spursi_rp(PTprof,depth_t,BLD,dataName,SKF,Islc);
-save([spursi_dir,'spursi_rpData.mat'],'rObs','rMOi','zml','Iprof')
+[rObs,rMOi,zbl,Iprof] = spursi_rp(PTprof,depth_t,BLD,dataName,SKF,Islc);
+save([spursi_dir,'spursi_rpData.mat'],'rObs','rMOi','zbl','Iprof')
 
 %% Compute dimensionless temperature gradients
 
@@ -176,3 +171,4 @@ xi_qs   = xi_ct(:,Islc);
 
 save([spursi_dir,'spursi_pzData.mat'],...
      'phi_qs','zeta_qs','etaX_qs','etaY_qs','fzS_qs','xi_qs')
+clear

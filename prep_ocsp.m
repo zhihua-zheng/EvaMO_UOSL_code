@@ -5,20 +5,20 @@
 % Zhihua Zheng, University of Washington, September 22 2019
 % =========================================================================
 
-%%
+%% Constants
 
 clear
-Lave = 1;
+Lave = 1; % the length of averaging interval [hr]
+kappa = 0.4;
 
 %% Loading
 
 iD = 1;
 scat_mode = 1;
 dataName = 'Papa';
+data_dir = './data/';
+ocsp_dir = [data_dir,'Papa/'];
 
-ocsp_root = '~/GDrive/UW/Research/Data/Papa/';
-MOconsts_name = '~/GDrive/UW/Research/Data/Misce/MO_consts.mat';
-load(MOconsts_name,'Rig_c','zeta_c','kappa','Rib_c');
 [SKF,PROF,depth_t,depth_s,zSt,ziSt] = get_skf_prof(Lave,dataName);
 
 %% Observed profiles
@@ -59,25 +59,23 @@ Ribprof = get_Rib(Bprof,SKF.Ustar',-depth_t);
 
 % 0.85 for 1.0MLD
 BLD = get_mld(flipud(Ribprof),-flipud(depth_t(2:end)),3,0.85);
-SLD = BLD*0.2;
-nL = find(depth_t < max(SLD),1,'last');
+SLD = BLD/5;
+nL  = find(depth_t < max(SLD),1,'last');
 ziSt_SL = ziSt_up(1:find(ziSt_up == -depth_t(nL)));
 
-% position of SL sensor depth in ziSt_up
+% position of SL sensor depths in ziSt_up
 [~,Pct] = ismember(-depth_t(1:nL),ziSt_up);
 
-% indices of SL sensor depth in ziSt_up
+% indices of SL sensor depths in ziSt_up
 Ict = ismember(ziSt_up,-depth_t(1:nL));
 
-% indices of SL sensor depth in ziSt_SL
+% indices of SL sensor depths in ziSt_SL
 ISL_ct = ismember(ziSt_SL,-depth_t(1:nL));
 
 %% Polynomial fit of profiles in ln(|z|)
 
-WLD = SKF.SD.Hs*0;
-% [gdT_fit,PTfit] = get_fit_gdT(depth_t,WLD,PTprof,BLD,3,0);
-% save([ocsp_root,'ocsp_fitData.mat'],'gdT_fit','PTfit')
-load([ocsp_root,'ocsp_fitData.mat'])
+[gdT_fit,PTfit] = get_fit_gdT(depth_t,iD,PTprof,BLD,3,0);
+save([ocsp_dir,'ocsp_fitData.mat'],'gdT_fit','PTfit')
 
 %% surface proximity function
 
@@ -108,7 +106,7 @@ get_qs_time;
 Iqs  = (stage == 1)'; % quasi-steady state
 Islc = and(Iqs,~IpartConvec);
 nSlc = sum(Islc);
-save([ocsp_root,'ocsp_skfData.mat'],'SKF','Islc')
+save([ocsp_dir,'ocsp_skfData.mat'],'SKF','Islc')
 
 %% Vertical temperature differences from observations & MOST
 
@@ -135,19 +133,18 @@ dT_fit(ic,:) = PTfit(iu,:)  - PTfit(jl,:);
 dT_MOi(ic,:) = get_MOST_Delta(FS.Tstar,MOL,zz,fop);
 
 % only use data in the surface layer
-IinSL = -WLD' > zz(1) & ...
-        -SLD' < zz(2); % when both sensors are in surface layer
+IinSL = -SLD' < zz(2);
 dT_obs(ic,~IinSL) = NaN;
 dT_MOi(ic,~IinSL) = NaN;
     end
 end
 
-save([ocsp_root,'ocsp_dTData.mat'],'dT_MOi','dT_fit','dT_obs')
+save([ocsp_dir,'ocsp_dTData.mat'],'dT_MOi','dT_fit','dT_obs')
 
 %% Temperature profiles for comparsion
 
-[rObs,rMOi,zml,Iprof] = ocsp_rp(PTprof,depth_t,BLD,dataName,SKF,Islc);
-save([ocsp_root,'ocsp_rpData.mat'],'rObs','rMOi','zml','Iprof')
+[rObs,rMOi,zbl,Iprof] = ocsp_rp(PTprof,depth_t,BLD,dataName,SKF,Islc);
+save([ocsp_dir,'ocsp_rpData.mat'],'rObs','rMOi','zbl','Iprof')
 
 %% Compute dimensionless temperature gradients
 
@@ -168,5 +165,6 @@ etaY_qs = etaYct(:,Islc);
 fzS_qs  = fzSct(:,Islc);
 xi_qs   = xi_ct(:,Islc);
 
-save([ocsp_root,'ocsp_pzData.mat'],...
+save([ocsp_dir,'ocsp_pzData.mat'],...
      'phi_qs','zeta_qs','etaX_qs','etaY_qs','fzS_qs','xi_qs')
+clear
