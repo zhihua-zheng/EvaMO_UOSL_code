@@ -23,6 +23,7 @@ function [phiS,phiM,TKE] = get_SMCse_phi_nol(zeta,mov)
 %
 %  phiS - Similarity function for scalars  from the SE limit of SMC
 %  phiM - Similarity function for momentum from the SE limit of SMC
+%  TKE  - Three components of the TKE, normalized by u_*^2
 %
 % AUTHOR:
 %  December 13 2019, Zhihua Zheng                         [ zhihua@uw.edu ]
@@ -82,6 +83,10 @@ S1 = 1/3/A1;
 nzet = numel(zeta);
 phiM = nan(size(zeta));
 phiS = nan(size(zeta));
+TKE.uu = nan(size(zeta));
+TKE.vv = nan(size(zeta));
+TKE.ww = nan(size(zeta));
+TKE.qq = nan(size(zeta));
 
 fun = @SMCse_phiEq_nol;
 options = optimoptions('fsolve',...'Algorithm','Levenberg-Marquardt',...
@@ -109,9 +114,10 @@ for i = 1:nzet
     phiS(i) = P(2);
     
     % normalized TKE components
-    TKE.uu(i) = P(3)^2*r + 6*A1*P(1)/P(3);
+    TKE.uu(i) = P(3)^2*r + 6*A1/P(3)*P(1);
     TKE.vv(i) = P(3)^2*r;
-    TKE.ww(i) = P(3)^2*r - 6*A1*zt/P(3);
+    TKE.ww(i) = P(3)^2*r - 6*A1/P(3)*zt;
+    TKE.qq(i) = P(3)^2;
 end
 
 %% Construct system of equations

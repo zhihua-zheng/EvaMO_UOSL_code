@@ -112,22 +112,22 @@ ssCT = gsw_CT_from_t(ssSA,SF.sst,ssp);
 Qtur = SF.hlb + SF.hsb + SF.nlw; % [W/m^2]
 
 % bulk surface heat flux
-SKF.Qo = SF.hlb + SF.hsb + SF.nlw + SF.nsw; % [W/m^2]
+SKF.Q0 = SF.hlb + SF.hsb + SF.nlw + SF.nsw; % [W/m^2]
 
 % surface freshwater flux into the ocean
 Ftur = (SF.rain - SF.evap)/1000/3600; % [m/s]
 
 % surface kinematic fluxes
-SKF.w_theta_0 = -Qtur/cp/rho0; % <w't'>_0 [C*m/s]
-SKF.w_s_0     =  Ftur.*ssSA;   % <w's'>_0 [(g/kg)*(m/s)]
-SKF.wb0T      =  g*(alpha .* SKF.w_theta_0);
-SKF.wb0S      = -g*(beta  .* SKF.w_s_0);
-SKF.w_b_0     =  SKF.wb0T + SKF.wb0S; % <w'b'>_0 [m^2/s^3]
+SKF.w_t_0 = -Qtur/cp/rho0; % <w't'>_0 [C*m/s]
+SKF.w_s_0 =  Ftur.*ssSA;   % <w's'>_0 [(g/kg)*(m/s)]
+SKF.wb0T  =  g*(alpha .* SKF.w_t_0);
+SKF.wb0S  = -g*(beta  .* SKF.w_s_0);
+SKF.w_b_0 =  SKF.wb0T + SKF.wb0S; % <w'b'>_0 [m^2/s^3]
 
 SKF.Ustar = sqrt(SF.tau/rho0); % [m/s]
 
 % bulk surface buoyancy flux, positive for buoycancy gain
-SKF.Bo = -g*(alpha .* (-SKF.Qo/cp/rho0) - beta .* SKF.w_s_0); % [m^2/s^3]
+SKF.B0 = -g*(alpha .* (-SKF.Q0/cp/rho0) - beta .* SKF.w_s_0); % [m^2/s^3]
 
 SKF.u10   = SF.u10;
 SKF.nsw   = SF.nsw;
@@ -138,9 +138,13 @@ SKF.evap  = SF.evap;
 
 %% Stokes drift velocity
 
-SKF.lstd  = SKF.u10.^2/g; % e-folding scale for waves
-SKF.SD    = SD;
-SKF.USt_0 = sqrt(SD.uSt(:,end).^2 + SD.vSt(:,end).^2);
+SKF.lstd    = SKF.u10.^2/g; % e-folding scale for waves
+SKF.Cp      = SD.Cp;
+SKF.Hs      = SD.Hs;
+SKF.waveAge = SD.Cp./SKF.Ustar;
+SKF.Cbar87  = SD.F87./(SKF.Ustar.^2);
+SKF.Cbar82  = SD.F82./(SKF.Ustar.^2);
+SKF.USt0    = sqrt(SD.uSt(:,end).^2 + SD.vSt(:,end).^2);
 
 %% Stokes drift shear projected to wind direction
 
@@ -149,18 +153,18 @@ windUnitx = SF.tau_x ./ SF.tau;
 windUnity = SF.tau_y ./ SF.tau;
 
 % downwind component & crosswind component of Stokes drift shear
-SKF.dUStDw_dz = windUnitx .* SD.duSt_dz + windUnity .* SD.dvSt_dz;
-SKF.dUStCw_dz = windUnitx .* SD.dvSt_dz - windUnity .* SD.duSt_dz;
+PROF.dUStDw_dz = windUnitx .* SD.duSt_dz + windUnity .* SD.dvSt_dz;
+PROF.dUStCw_dz = windUnitx .* SD.dvSt_dz - windUnity .* SD.duSt_dz;
 
-SKF.UStDw = windUnitx .* SD.uSt + windUnity .* SD.vSt;
-SKF.UStCw = windUnitx .* SD.vSt - windUnity .* SD.uSt;
+PROF.UStDw = windUnitx .* SD.uSt + windUnity .* SD.vSt;
+PROF.UStCw = windUnitx .* SD.vSt - windUnity .* SD.uSt;
 
-SKF.eta_x = -SKF.dUStDw_dz ./ Ustar_kz;
-SKF.eta_y = -SKF.dUStCw_dz ./ Ustar_kz;
+PROF.eta_x = -PROF.dUStDw_dz ./ Ustar_kz;
+PROF.eta_y = -PROF.dUStCw_dz ./ Ustar_kz;
 
 % direction of wind and Stokes dirft, counter-clockwise from East
-SKF.wind_deg = atan2d(windUnity,windUnitx);
-SKF.wave_deg = atan2d(SD.vSt,SD.uSt);
+wind_deg = atan2d(windUnity,windUnitx);
+wave_deg = atan2d(SD.vSt,SD.uSt);
 
 %% roughness length
 

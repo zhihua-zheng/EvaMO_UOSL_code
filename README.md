@@ -1,6 +1,6 @@
 [![DOI](https://zenodo.org/badge/287464756.svg)](https://zenodo.org/badge/latestdoi/287464756)
 
-**This repository contains the MATLAB scripts used in the paper "Evaluating Monin-Obukhov scaling in the unstable oceanic surface layer"**
+**This repository contains the MATLAB scripts used in the paper "Evaluating Monin-Obukhov Scaling in the Unstable Oceanic Surface Layer", J. Phys. Oceanogr., doi:10.1175/JPO-D-20-0201.1.**
 
 You can reach me at [zhihua@uw.edu](mailto:zhihua@uw.edu) for questions related to the usage of this code. 
 
@@ -24,7 +24,7 @@ It also uses some external toolboxes/functions, as listed below:
 - [tight_subplot](https://www.mathworks.com/matlabcentral/fileexchange/27991-tight_subplot-nh-nw-gap-marg_h-marg_w)
 
 ### Data
-The data used in this work are mostly publicly available (see the "Data availability statement" in our paper). For convience, a copy of the original data can be downloaded either from [this Google Drive link](https://drive.google.com/file/d/13UYYOT9AXFufjMw6_wr4-hoNv7M3tT7v/view?usp=sharing), or from the most recent [release](https://github.com/zhihua-zheng/EvaMO_UOSL_code/releases/tag/v1.0) of this repository.
+The data used in this work are mostly publicly available (see the "Data availability statement" in our paper). For convience, a copy of the original data can be downloaded either from [this Google Drive link](https://drive.google.com/file/d/13UYYOT9AXFufjMw6_wr4-hoNv7M3tT7v/view?usp=sharing), or from the most recent [release](https://github.com/zhihua-zheng/EvaMO_UOSL_code/releases/tag/v1.1) of this repository.
 
 ### Work flow
 1. Download this repository to your local computer. Alternatively, you can clone it using the command line in Terminal,
@@ -38,11 +38,11 @@ Add this repository to your MATLAB search path
 addpath(genpath('<path to this repository>'))
 ```
 
-2. Download the data file `EvaMO_UOSL_data.zip` as described in the previous [Data](#-data) section. Unzip it into the `EvaMO_UOSL_code` directory.
+2. Download the data file `EvaMO_UOSL_data.zip` following the [Data](#-data) section. Unzip it into the top-level directory of the repository `EvaMO_UOSL_code`.
 
 3. Run the main analysis script `evaMO_main.m`.
 
 ### Attribution
-This code is freely available for reuse as described in the MIT License. However, if you use this code in an academic publication, a propriate citation to the source would be appreciated:
+This set of scripts is free for reuse as described in the MIT License. However, if you use this code in an academic publication, a propriate citation to the source would be appreciated:
 
-* Zhihua Zheng. (2020, August 17). Analysis scripts for "Evaluating Monin-Obukhov scaling in the unstable oceanic surface layer" (Version v1.0). Zenodo. doi:10.5281/zenodo.3988503
+* Zhihua Zheng. (2020, December 22). Analysis scripts for "Evaluating Monin-Obukhov Scaling in the Unstable Oceanic Surface Layer". Zenodo. doi:10.5281/zenodo.3988503

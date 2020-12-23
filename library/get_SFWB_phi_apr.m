@@ -1,10 +1,10 @@
-function [phiS,phiM,TKE] = get_SFWB_phi_apr(zeta,xi,mop)
+function [phiS,phiM,TKE] = get_SFWB_phi_apr(zeta,xi,alpha_b,mop)
 %
 % get_SFWB_phi_apr
 %==========================================================================
 %
 % USAGE:
-%  [phiS,phiM,TKE] = get_SFWB_phi_apr(zeta,xi,mop)
+%  [phiS,phiM,TKE] = get_SFWB_phi_apr(zeta,xi,alpha_b,mop)
 %
 % DESCRIPTION:
 %  Compute Monin-Obukhov similarity functions for scalars and momentum
@@ -17,8 +17,9 @@ function [phiS,phiM,TKE] = get_SFWB_phi_apr(zeta,xi,mop)
 %  zeta - Monin-Obukhov stability parameter, |z|/MOL
 %  xi   - Normalized vertical distance, |z|/z_0
 %  mop  - Model option:
-%         1 add turbulent diffusion term in TKE equation
-%         2 add turbulent diffusion term in TKE and TKE component equations
+%         1 model SFWB as turbulent transport  of TKE
+%         2 model SFWB as turbulent transports of TKE and TKE-components
+%         3 model SFWB as pressure  transport  of TKE (Janssen 2012)
 %
 % OUTPUT:
 %
@@ -30,20 +31,42 @@ function [phiS,phiM,TKE] = get_SFWB_phi_apr(zeta,xi,mop)
 %  April 8 2020, Zhihua Zheng                             [ zhihua@uw.edu ]
 %==========================================================================
 
+%% Parsing inputs
+
+nZet = numel(zeta);
+nXi  = numel(xi);
+nAlB = numel(alpha_b);
+
+if nAlB == 1
+    alpha_b = repmat(alpha_b,size(zeta));
+elseif nAlB ~= nZet
+    disp('Unable to interpret parameter alpha_b ...')
+    disp('Please check input dimension!')
+    return
+end
+
+if nXi == 1
+    xi = repmat(xi,size(zeta));
+elseif nZet == 1
+    zeta = repmat(zeta,size(xi));    
+elseif nXi ~= nZet
+    disp('Unable to interpret parameter xi ...')
+    disp('Please check input dimension!')
+    return
+end
+
 %% Single constants
 
-A1  = 0.92;
-A2  = 0.74;
-B1  = 16.6;
-B2  = 10.1;
-C1  = 0.08;
-C2  = 0.7;
-C3  = 0.2;
+A1 = 0.92;
+A2 = 0.74;
+B1 = 16.6;
+B2 = 10.1;
+C1 = 0.08;
+C2 = 0.7;
+C3 = 0.2;
 
-Sq  = 0.2;
-
-alpha_b = 100;
-kappa   = 0.4;
+Sq = 0.2;
+kappa = 0.4;
 
 %% Combined constants
 
@@ -65,30 +88,20 @@ S1 = 1/3/A1;
 
 %% Dimensionaless functions
 
-nZet = numel(zeta);
-nXi  = numel(xi);
-
-if nXi == 1
-    xi = repmat(xi,size(zeta));
-
-elseif nZet == 1
-    zeta = repmat(zeta,size(xi));
-    
-elseif nXi ~= nZet  
-    disp('Unable to interpret normalized depth xi ...')
-    disp('Please check input dimension!')
-    return
-end
-
-phiM = nan(size(zeta));
-phiS = nan(size(zeta));
+phiM   = nan(size(zeta));
+phiS   = nan(size(zeta));
+TKE.uu = nan(size(zeta));
+TKE.vv = nan(size(zeta));
+TKE.ww = nan(size(zeta));
+TKE.qq = nan(size(zeta));
 
 switch mop
     case 1
-        fun = @SFWB_phiEq1_nol;
-    
+        fun = @SFWB_phiEq1_nol;    
     case 2
-        fun = @SFWB_phiEq2_nol;
+        fun = @SFWB_phiEq2_nol;        
+    case 3
+        fun = @SFWB_phiEq3_nol;
 end
 
 options = optimoptions('fsolve',...'Algorithm','Levenberg-Marquardt',...
@@ -97,7 +110,14 @@ options = optimoptions('fsolve',...'Algorithm','Levenberg-Marquardt',...
 for j = 1:numel(zeta) 
     
     zt = zeta(j);
-    eb = c*xi(j)^(-n);
+    
+    if mop == 3
+        eb  = xi(j);
+        alB = alpha_b(j)*kappa;
+    else
+        eb = c(j)*xi(j)^(-n);
+    end
+    
     aPar = [zt eb];
     
     if sum(isnan(aPar)) == 0
@@ -158,7 +178,7 @@ end
 
 %% Construct system of equations
 
-% this version includes vertical diffusion in TKE components
+% this version includes turbulent diffusion in TKE-component equations
 
 function F = SFWB_phiEq2_nol(p)
 
@@ -174,6 +194,26 @@ F(1) = p(1)*( R1 - (Z1*zt - X1*eb)/(p(3)^3) ) - ...
 F(2) = p(2)*( r - (Z3*zt - X1*eb)/(p(3)^3) ) - S2/p(3);
 
 F(3) = B1*( p(1) - zt ) + eb - p(3)^3;
+
+end
+
+%% Construct system of equations
+
+% this version includes pressure diffusion in TKE equation
+
+function F = SFWB_phiEq3_nol(p)
+
+%==========================================================================
+% p(1) : \phi_m^x
+% p(2) : \phi_h
+% p(3) : q^*
+%==========================================================================
+
+F(1) = p(1)*( R1 - Z1*zt/(p(3)^3) ) - p(2)*Z2*zt/(p(3)^3) - S1/p(3);
+   
+F(2) = p(2)*( r - Z3*zt/(p(3)^3) ) - S2/p(3);
+
+F(3) = B1*( p(1)*(1-exp(-4*eb))^2 - zt + alB*eb*exp(-eb) ) - p(3)^3;
 
 end
 

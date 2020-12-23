@@ -21,7 +21,7 @@ spursi_dir = [data_dir,'SPURSI/'];
 
 [SKF,PROF,depth_t,depth_s,zSt,ziSt] = get_skf_prof(Lave,dataName);
 
-%% observed profiles
+%% Observed profiles
 
 idatm = PROF.datm;
 idahr = PROF.dahr;
@@ -61,7 +61,7 @@ Ribprof = get_Rib(Bprof,SKF.Ustar',-depth_t);
 % figure('position',[0 0 600 300])
 % plot(Rib_c_list,BLD_rmse,'-o'); grid on
 
-% 2.30 for 1.0MLD
+% 2.30 for 1.0*MLD
 BLD = get_mld(flipud(Ribprof),-flipud(depth_t(2:end)),3,2.30);
 SLD = BLD*0.2;
 nL  = find(depth_t < max(SLD),1,'last');
@@ -78,20 +78,21 @@ ISL_ct = ismember(ziSt_SL,-depth_t(1:nL));
 
 %% Polynomial fit of profiles in ln(|z|)
 
-[gdT_fit,PTfit] = get_fit_gdT(depth_t,iD,PTprof,BLD,3,0);
-save([spursi_dir,'spursi_fitData.mat'],'gdT_fit','PTfit')
+[gdT_fit,PTfit,itype] = get_fit_gdT(depth_t,iD,PTprof,BLD,3,0);
+save([spursi_dir,'spursi_fitData.mat'],'gdT_fit','PTfit','itype')
+% load([spursi_dir,'spursi_fitData.mat'])
 
 %% Surface proximity function
 
-Ls  = get_Ls(ziSt,BLD,SKF.dUStDw_dz,kappa);
+Ls  = get_Ls(ziSt,BLD,PROF.dUStDw_dz,kappa);
 fzS = 1 + tanh(ziSt/4./Ls);
 SKF.Ls = Ls';
 
 %% Normalized Stokes drift shear and fzs in Harcourt (2015)
 
 % transposition
-etaX = flipud(SKF.eta_x');
-etaY = flipud(SKF.eta_y');
+etaX = flipud(PROF.eta_x');
+etaY = flipud(PROF.eta_y');
 fzS  = flipud(fzS);
 
 %% Partial convection and quasi-steady state
@@ -103,8 +104,8 @@ fzS  = flipud(fzS);
 IpartConvec = FS_SL.Tstar(1,:) < 0 & FS_SL.Tstar(end,:) > 0;
 
 % buoyancy flux at boundary layer depth
-[~,~,FS_BLD] = MOSTpar_from_flux(-BLD,dataName,SKF);
-BfH = FS_BLD.Bf;
+% [~,~,FS_BLD] = MOSTpar_from_flux(-BLD,dataName,SKF);
+% BfH = FS_BLD.Bf;
 get_qs_time;
 
 Iqs  = (stage == 1)'; % quasi-steady state
@@ -150,6 +151,10 @@ save([spursi_dir,'spursi_dTData.mat'],'dT_MOi','dT_fit','dT_obs')
 [rObs,rMOi,zbl,Iprof] = spursi_rp(PTprof,depth_t,BLD,dataName,SKF,Islc);
 save([spursi_dir,'spursi_rpData.mat'],'rObs','rMOi','zbl','Iprof')
 
+%% Wave breaking energy factor
+
+alphaB_P82 = (SKF.Cbar82./SKF.Ustar)';
+
 %% Compute dimensionless temperature gradients
 
 gdT_log = FS_SL.Tstar(ISL_ct,:) ./ (-ziSt_SL(ISL_ct));
@@ -168,7 +173,8 @@ etaX_qs = etaXct(:,Islc);
 etaY_qs = etaYct(:,Islc);
 fzS_qs  = fzSct(:,Islc);
 xi_qs   = xi_ct(:,Islc);
+alB_qs  = alphaB_P82(Islc);
 
 save([spursi_dir,'spursi_pzData.mat'],...
-     'phi_qs','zeta_qs','etaX_qs','etaY_qs','fzS_qs','xi_qs')
+     'phi_qs','zeta_qs','etaX_qs','etaY_qs','fzS_qs','xi_qs','alB_qs')
 clear

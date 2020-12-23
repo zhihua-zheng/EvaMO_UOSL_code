@@ -4,10 +4,12 @@ function PZ_scat(pzData,iD,fh,axm,fpart)
 
 zet_range(1,:) = [2e-3 5];
 zet_range(2,:) = [3e-2 5];
+% zet_range(2,:) = [2e-3 5];
 zet_range(3,:) = [3e-3 5];
 
 bin_lim(1,:) = [-3.0 0.7];
 bin_lim(2,:) = [-1.6 0.7];
+% bin_lim(2,:) = [-3.0 0.7];
 bin_lim(3,:) = [-3.0 0.7];
 
 phi_range(1,:) = [6e-2 1.5];
@@ -36,12 +38,15 @@ etaX = pzData.etaX_qs;
 etaY = pzData.etaY_qs;
 fzS  = pzData.fzS_qs;
 xi   = pzData.xi_qs;
+alB  = pzData.alB_qs;
+alB  = repmat(alB,size(phi,1),1);
 
 %% Preprocessing
 
-xi(xi<1) = NaN;
+xi(xi<1)   = NaN;
+alB(alB<0) = NaN;
 Igood = ~isnan(phi) & ~isnan(zeta) & ~isnan(etaX) &...
-        ~isnan(etaY) & ~isnan(fzS) & ~isnan(xi);
+        ~isnan(etaY) & ~isnan(fzS) & ~isnan(xi);...& ~isnan(alB);
 
 x_data   = zeta(Igood);
 y_data   = phi(Igood);
@@ -49,6 +54,7 @@ etX_data = etaX(Igood);
 etY_data = etaY(Igood);
 fzS_data = fzS(Igood);
 xi_data  = xi(Igood);
+alB_data = alB(Igood);
 
 IposX = x_data >  0;
 InegX = x_data <= 0;
@@ -59,20 +65,22 @@ pex_data = etX_data(IposX);
 pey_data = etY_data(IposX);
 pf_data  = fzS_data(IposX);
 pxi_data = xi_data(IposX);
+pal_data = alB_data(IposX);
 
-ny_data = y_data(InegX);
-nx_data = -x_data(InegX);
+ny_data  = y_data(InegX);
+nx_data  = -x_data(InegX);
 nex_data = etX_data(InegX);
 ney_data = etY_data(InegX);
-nf_data = fzS_data(InegX);
+nf_data  = fzS_data(InegX);
 nxi_data = xi_data(InegX);
+nal_data = alB_data(InegX);
 
 %% Figure
 
 switch fpart
     case 1 % Unstable side
 
-Ifrcc  = nx_data <= 3; % "forced convection"
+Ifrcc  = nx_data <= 3; % forced convection
 bin_xi = logspace(bin_lim(iD,1),bin_lim(iD,2),24)';
 Ngood  = numel(nx_data(Ifrcc));
 NminC  = Ngood*0.005;
@@ -84,7 +92,10 @@ Nzet       = -logspace(-5,1.5,100);
 Nphi_H15  = get_H15se_phi_nol(-nx_data,nex_data,ney_data,nf_data,2);
 Nphi_H15B = get_H15se_phi_nol(-nx_data,nex_data,ney_data,0,2);
 Nphi_H15T = get_H15se_phi_nol(-nx_data,nex_data,ney_data,1,2);
-Nphi_WBv1 = get_SFWB_phi_apr(-nx_data,nxi_data,1);
+
+constAlB = repmat(100,size(nal_data));
+Nphi_WBv1 = get_SFWB_phi_apr(-nx_data,nxi_data,constAlB,1);
+% Nphi_WBv1 = get_SFWB_phi_apr(-nx_data,nxi_data,nal_data,1);
 
 Nref71 = plot(axm,-Nzet,Nphi71,'color',[.5 .5 .5],...
                   'linewidth',3);
@@ -198,9 +209,9 @@ end
     
 Pzet       = logspace(-5,1.5,100);
 [Pphi71,~] = get_emp_phi(Pzet,'Kansas');
-Pphi_H15  = get_H15se_phi_nol(px_data,pex_data,pey_data,pf_data,2);
-Pphi_H15B = get_H15se_phi_nol(px_data,pex_data,pey_data,0,2);
-Pphi_H15T = get_H15se_phi_nol(px_data,pex_data,pey_data,1,2);
+Pphi_H15   = get_H15se_phi_nol(px_data,pex_data,pey_data,pf_data,2);
+Pphi_H15B  = get_H15se_phi_nol(px_data,pex_data,pey_data,0,2);
+Pphi_H15T  = get_H15se_phi_nol(px_data,pex_data,pey_data,1,2);
 
 Pgood = numel(px_data);
 PminC = max(Pgood*0.001,5);

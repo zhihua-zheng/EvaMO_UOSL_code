@@ -28,37 +28,38 @@ zeta_range = [min(zeta) max(zeta)];
 xi_range   = [min(xi)   max(xi)];
 
 [pS0,~] = get_SMCse_phi_nol(zeta,'KC1994');
-[pS1,~] = get_SFWB_phi_apr(Zeta,Xi,1);
-% [pS2,~]   = get_SFWB_phi_de(Zeta,Xi);
+[pS1,~] = get_SFWB_phi_apr(Zeta,Xi,100,1);
+% [pS2,~]   = get_SFWB_phi_de(Zeta,Xi,100,2);
 
 %% Figure for Phi_h, with approximation
 
 pS_lev = [.1 .22 .25 .3 .45 .6]';
-cmap_seq = cbrewer('seq','Purples',10);
+cmap_seq = customcolormap([0 0.6 1],...
+           [rgb('cool grey'); rgb('light grey'); [1 1 1]],10);
 
 [~,h1] = contourf(axm,zeta,xi,pS1,pS_lev,'linewidth',2,...
                   'linecolor',[.75 .75 .75]);
 hold(axm,'on')
 colormap(axm,cmap_seq); caxis(axm,[0 1])
 hcb = colorbar(axm,'northoutside');
-hcb.Position = [0.073 0.91 0.46 0.03];
+hcb.Position = [0.066 0.91 0.39 0.03];
 
 hsPA = scatter(axm,zetaPA,xiPA,10,rgb('azure'),'s','filled',...
-               'MarkerEdgeColor',[.6 .6 .6],'MarkerFaceAlpha',0.25,...
+               'MarkerEdgeColor',[.6 .6 .6],'MarkerFaceAlpha',0.4,...
                'MarkerEdgeAlpha',0.2);
-hsSP = scatter(axm,zetaSP,xiSP,10,rgb('coral'),'s','filled',...
-               'MarkerEdgeColor',[.6 .6 .6],'MarkerFaceAlpha',0.25,...
+hsSP = scatter(axm,zetaSP,xiSP,10,rgb('coral'),'^','filled',...
+               'MarkerEdgeColor',[.6 .6 .6],'MarkerFaceAlpha',0.4,...
                'MarkerEdgeAlpha',0.2);
 plot(axm,r2o*[1 10],xi_range,'color',rgb('amber'),'linewidth',3)
 
-contour(axm,zeta,xi,pS1,pS_lev,'linewidth',2,'linecolor',[.75 .75 .75])
+contour(axm,zeta,xi,pS1,pS_lev,'linewidth',2,'linecolor',[.73 .73 .73])
 [c2,h2] = contour(axm,zeta,xi,pS1./pS0,[.2 .4 .6 .8 1 1.2 1.4],...
                   'linecolor','k','showtext','on','linewidth',1.2);
 clabel(c2,h2,'fontsize',14,'fontname','SansSerif','LabelSpacing',505)
 
 grid(axm,'on')
 set(axm,'TickDir','out','Box','on')
-text(axm,0.02,0.02,'(a)','Units','Normalized','FontSize',22,...
+text(axm,0.08,0.02,'(a)','Units','Normalized','FontSize',22,...
          'HorizontalAlignment','left','VerticalAlignment','bottom')
 set(axm,'ydir','reverse','xlim',zeta_range,'ylim',xi_range)
 hl1 = legend(axm,[h1 h2 hsPA hsSP],...
@@ -74,9 +75,9 @@ set(hl1.BoxFace,'ColorType','truecoloralpha', ...
 drawnow;
 hl1_comp = hl1.EntryContainer.Children;
 set(hl1_comp(1).Icon.Transform.Children.Children,...
-    'Size',8, 'FaceColorData',uint8(255*[rgb('coral')'; 0.7]))
+    'Size',10, 'FaceColorData',uint8(255*[rgb('coral')'; 0.7]))
 set(hl1_comp(2).Icon.Transform.Children.Children,...
-    'Size',8, 'FaceColorData',uint8(255*[rgb('azure')'; 0.7]))
+    'Size',10, 'FaceColorData',uint8(255*[rgb('azure')'; 0.7]))
 
 % adjust label position
 off_r = 0.02;

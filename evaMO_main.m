@@ -50,28 +50,30 @@ dT_scat(dTSP,SPqs,2,dTax(3),1,1);
 plot_profcom(rpPA,1,dTax(2));
 plot_profcom(rpSP,2,dTax(4));
 
-%% Figure 5: boxplot for observed phi_h in zeta space
+%% Figure 5: boxplot for the observed phi_h in zeta space
 
 phi_obs = {pzPA.phi_qs(:)  pzSP.phi_qs(:)};
 zet_obs = {pzPA.zeta_qs(:) pzSP.zeta_qs(:)};
 PZ_scat_obs(phi_obs,zet_obs);
 
-%% Figure 6: predictions from the 'SE' surface wave breaking model
+%% Figure 6: predictions from the "SE" surface wave breaking model
 
-Poff = 0.08;
-WBf = figure('position',[0 0 935 530]);
-[WBax,WBpos] = tight_subplot(1,2,[.02 .05],[.09 .1],[.05 .09]);
+Poff = 0.14;
+WBf = figure('position',[0 0 1015 500]);
+[WBax,WBpos] = tight_subplot(1,3,[.03 .04],[.09 .1],[.04 .04]);
 WBax(1).Position = [WBpos{1}(1:2) WBpos{1}(3)+Poff WBpos{1}(4)];
-WBax(2).Position = [WBpos{2}(1)+Poff WBpos{2}(2) WBpos{2}(3)-Poff WBpos{2}(4)];
+WBax(2).Position = [WBpos{2}(1)+Poff   WBpos{2}(2) WBpos{2}(3)-Poff/2 WBpos{2}(4)];
+WBax(3).Position = [WBpos{3}(1)+Poff/2 WBpos{3}(2) WBpos{3}(3)-Poff/2 WBpos{3}(4)];
 
 r2o = -0.2; % z_0/L
 plot_SFWB_phi2d(WBax(1),r2o,pzPA,pzSP)
-q_in_SFWB(r2o,[],WBf,WBax(2))
+q_in_SFWB(WBf,WBax(2),r2o,[])
+demo_sfwbProf(WBax(3),r2o)
 
 %% Figure 7: predictions from the SE Langmuir turbulence model
 
 figure('position',[0 0 1015 500]);
-[LTax,~] = tight_subplot(1,2,[.03 .03],[.1 .1],[.06 .08]);
+[LTax,~] = tight_subplot(1,2,[.03 .03],[.1 .1],[.06 .06]);
 plot_H15se_phi2d(LTax,'H2015',pzPA,pzSP);
 
 %% Figure 8: comparison of phi_h from Kansas, observations and models
@@ -82,14 +84,14 @@ PZf = figure('position',[0 0 1050 510]);
 PZ_scat(pzPA,1,PZf,PZax(1),1);
 PZ_scat(pzSP,2,PZf,PZax(2),1);
 
-%% Figure 9: phi_h & l^* from the SE Langmuir turbulence model including length scale Eq.
+%% Figure 9: phi_h & l^* from the SE Langmuir model with dynamic length scale
 
 % Find optimal E6 value for SMCLT with varying l^*
 
 % dT_obs_SMCLT;
 % figure;
 % plot(E6_list,slp,'-o'); grid on
-% optimal E6 is 2.4, with slp = 1
+% optimal E6 is about 2.5, with slp ~ 1
 % save([spursi_dir,'spursi_slpE6.mat'],'E6_list','slp')
 
 Lstarf = figure('position',[0 0 820 800]);
@@ -102,7 +104,7 @@ phi_lstar_E6(pzSP,2,oE6,lsrAx,1);
 %% Forcing distribution at two sites
 
 xString = 'H_s [m]';
-plot_pdf(skfPA.SKF.SD.Hs(PAqs),skfSP.SKF.SD.Hs(SPqs),22,xString)
+plot_pdf(skfPA.SKF.Hs(PAqs),skfSP.SKF.Hs(SPqs),22,xString)
 xlim([0 10])
 
 xString = 'u_* [m s^{-1}]';
@@ -110,7 +112,7 @@ plot_pdf(skfPA.SKF.Ustar(PAqs),skfSP.SKF.Ustar(SPqs),22,xString)
 xlim([0 0.04])
 
 xString = 'B_0 [m^2 s^{-3}]';
-plot_pdf(skfPA.SKF.Bo(PAqs),skfSP.SKF.Bo(SPqs),42,xString)
+plot_pdf(skfPA.SKF.B0(PAqs),skfSP.SKF.B0(SPqs),42,xString)
 xlim([-6e-7 4e-7])
 
 xString = '\eta^x';

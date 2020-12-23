@@ -39,11 +39,11 @@ switch casename
         waterType = 3;
 end
 
-w_b_0     = SKF.w_b_0';
-w_s_0     = SKF.w_s_0';
-w_theta_0 = SKF.w_theta_0';
-alpha     = SKF.alpha';
-NSW       = SKF.nsw;
+w_b_0 = SKF.w_b_0';
+w_s_0 = SKF.w_s_0';
+w_t_0 = SKF.w_t_0';
+alpha = SKF.alpha';
+NSW   = SKF.nsw;
 
 %% Constants
 
@@ -81,8 +81,8 @@ switch band_SR
 end
 
 % depth dependent flux due to the penetrative shortwave radiation
-w_theta_r = -(NSW' - Iz)/cp/rho0;
-w_b_r     = g*(alpha .* w_theta_r);
+w_t_r = -(NSW' - Iz)/cp/rho0;
+w_b_r = g*(alpha .* w_t_r);
 
 %% MOST parameters
 
@@ -92,7 +92,7 @@ FS.Bf = -(w_b_r + w_b_0);
 % surface layer scales
 FS.Ustar =  SKF.Ustar';
 FS.Sstar = -w_s_0 ./ FS.Ustar / kappa;
-FS.Tstar = -(w_theta_r + w_theta_0) ./ FS.Ustar / kappa;
+FS.Tstar = -(w_t_r + w_t_0) ./ FS.Ustar / kappa;
 FS.Bstar =  FS.Bf ./ FS.Ustar / kappa;
 
 % Monin-Obukhov length [m]
@@ -106,7 +106,7 @@ else
 end
 
 % Append non-turbuelnt fluxes
-FS.w_theta_r = w_theta_r;
-FS.w_b_r     = w_b_r;
+FS.w_t_r = w_t_r;
+FS.w_b_r = w_b_r;
 
 end

@@ -10,7 +10,7 @@ iSAprof = iPROF.SAprof';
 iPDprof = iPROF.PDprof';
 tprof   = iPROF.tprof';
 w_s_0   = SKF.w_s_0;
-w_t_0   = SKF.w_theta_0; % night time, no solar radiation
+w_t_0   = SKF.w_t_0; % night time, no solar radiation
 
 Idawn   = find(SKF.Idawn);
 Idusk   = find(SKF.Idusk);

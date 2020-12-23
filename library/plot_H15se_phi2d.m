@@ -50,20 +50,21 @@ end
 %% Figure: Phi_h in (zeta, eta^x) space
 
 pS_lev = [.1 .15 .2 .3 .4 .5 .7]';
-cmap_seq = cbrewer('seq','Purples',10);
+cmap_seq = customcolormap([0 0.6 1],...
+           [rgb('cool grey'); rgb('light grey'); [1 1 1]],10);
 
 [~,h1] = contourf(LTax(1),zet,etX,pS1,pS_lev,'linewidth',2,...
                   'linecolor',[.7 .7 .7]);
 hold(LTax(1),'on')
 colormap(LTax(1),cmap_seq); caxis(LTax(1),[0 1]); 
 hcb1 = colorbar(LTax(1),'northoutside');
-hcb1.Position = [0.082 0.92 0.39 0.03];
+hcb1.Position = [0.083 0.92 0.4 0.03];
 
 hsPA = scatter(LTax(1),zetaPA,etaxPA,10,rgb('azure'),'s','filled',...
-               'MarkerEdgeColor',[.6 .6 .6],'MarkerFaceAlpha',0.25,...
+               'MarkerEdgeColor',[.6 .6 .6],'MarkerFaceAlpha',0.4,...
                'MarkerEdgeAlpha',0.2);          
-hsSP = scatter(LTax(1),zetaSP,etaxSP,10,rgb('coral'),'s','filled',...
-               'MarkerEdgeColor',[.6 .6 .6],'MarkerFaceAlpha',0.25,...
+hsSP = scatter(LTax(1),zetaSP,etaxSP,10,rgb('coral'),'^','filled',...
+               'MarkerEdgeColor',[.6 .6 .6],'MarkerFaceAlpha',0.4,...
                'MarkerEdgeAlpha',0.2);          
 
 contour(LTax(1),zet,etX,pS1,pS_lev,'linewidth',2,'linecolor',[.7 .7 .7]);
@@ -92,9 +93,9 @@ set(hl1.BoxFace,'ColorType','truecoloralpha', ...
 drawnow;
 hl1_comp = hl1.EntryContainer.Children;
 set(hl1_comp(1).Icon.Transform.Children.Children,...
-    'Size',8, 'FaceColorData',uint8(255*[rgb('coral')'; 0.7]))
+    'Size',10, 'FaceColorData',uint8(255*[rgb('coral')'; 0.7]))
 set(hl1_comp(2).Icon.Transform.Children.Children,...
-    'Size',8, 'FaceColorData',uint8(255*[rgb('azure')'; 0.7]))
+    'Size',10, 'FaceColorData',uint8(255*[rgb('azure')'; 0.7]))
 
 % adjust label position
 off_r = 0.02;
@@ -165,25 +166,26 @@ set(ylh,'Position',ylh.Position + [-off_r 0 0]);
 %% Variation of Phi_h in (zeta, fzs) space
 
 [zeta,fzS] = meshgrid(zet,fzs);
-[pS2,~] = get_H15se_phi_nol(zeta,cEtX,0,fzS,2);
+[pS2,~] = get_H15se_phi_nol(zeta,cEtX,cEtY,fzS,2);
 
 %% Figure: phi_h in (zeta, fzs) space
 
 pS_lev = [.1 .15 .2 .3 .4 .5 .7]';
-cmap_seq = cbrewer('seq','Purples',10);
+cmap_seq = customcolormap([0 0.6 1],...
+           [rgb('cool grey'); rgb('light grey'); [1 1 1]],10);
 
 [~,h1] = contourf(zet,fzs,pS2,pS_lev,'linewidth',2,...
                   'linecolor',[.7 .7 .7]); 
 hold(LTax(2),'on')
 colormap(LTax(2),cmap_seq); caxis(LTax(2),[0 1]);
 hcb2 = colorbar(LTax(2),'northoutside');
-hcb2.Position = [0.507 0.92 0.39 0.03];
+hcb2.Position = [0.517 0.92 0.4 0.03];
 
 hsPA = scatter(zetaPA,fzsPA,10,rgb('azure'),'s','filled',...
-               'MarkerEdgeColor',[.6 .6 .6],'MarkerFaceAlpha',0.25,...
+               'MarkerEdgeColor',[.6 .6 .6],'MarkerFaceAlpha',0.4,...
                'MarkerEdgeAlpha',0.2);          
-hsSP = scatter(zetaSP,fzsSP,10,rgb('coral'),'s','filled',...
-               'MarkerEdgeColor',[.6 .6 .6],'MarkerFaceAlpha',0.25,...
+hsSP = scatter(zetaSP,fzsSP,10,rgb('coral'),'^','filled',...
+               'MarkerEdgeColor',[.6 .6 .6],'MarkerFaceAlpha',0.4,...
                'MarkerEdgeAlpha',0.2);          
 
 contour(zet,fzs,pS2,pS_lev,'linewidth',2,'linecolor',[.7 .7 .7])
@@ -213,9 +215,9 @@ set(hl4.BoxFace,'ColorType','truecoloralpha', ...
 drawnow;
 hl4_comp = hl4.EntryContainer.Children;
 set(hl4_comp(1).Icon.Transform.Children.Children,...
-    'Size',8, 'FaceColorData',uint8(255*[rgb('coral')'; 0.7]))
+    'Size',10, 'FaceColorData',uint8(255*[rgb('coral')'; 0.7]))
 set(hl4_comp(2).Icon.Transform.Children.Children,...
-    'Size',8, 'FaceColorData',uint8(255*[rgb('azure')'; 0.7]))
+    'Size',10, 'FaceColorData',uint8(255*[rgb('azure')'; 0.7]))
 
 % adjust label position
 off_r = 0.02;

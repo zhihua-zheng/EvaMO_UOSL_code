@@ -1,4 +1,4 @@
-function Q_inq = q_in_SFWB(r2o,xi_inq,fh,axm)
+function Q_inq = q_in_SFWB(fh,axm,r2o,xi_inq)
 %
 % q_in_SFWB
 %==========================================================================
@@ -125,41 +125,30 @@ plot(axm,C96_sol.^(1/3),xi_mesh,'linestyle','--','color',rgb('blood'),...
          'linewidth',2)
 plot(axm,Qlog.^(1/3),xi_mesh,'linestyle','--','color',[.5 .5 .5],...
          'linewidth',2)
-set(axm,'ydir','reverse','ylim',[1 10],'TickDir','out')
-text(axm,0.02,0.02,'(b)','Units','Normalized','FontSize',22,...
-     'HorizontalAlignment','left','VerticalAlignment','bottom')
-text(axm,0.98,0.02,'(c)','Units','Normalized','FontSize',22,...
+set(axm,'ydir','reverse','ylim',[1 10],'xlim',[2 10],...
+        'TickDir','out','FontSize',14)
+text(axm,0.92,0.02,'(b)','Units','Normalized','FontSize',22,...
      'HorizontalAlignment','right','VerticalAlignment','bottom')
 
-lgd = legend(axm,'numerical sol.','approximated sol.',...
+lgd = legend(axm,'numerical sol.','approximate sol.',...
                  'neutral sol.','no wave breaking','fontsize',16,...
-                 'Position',[0.67 0.2 0.2 0.16],'AutoUpdate','off');
+                 'Position',[0.562 0.33 0.18 0.17],'AutoUpdate','off');
 set(lgd.BoxFace,'ColorType','truecoloralpha',...
-    'ColorData',uint8(255*[1; 1; 1; .8]))
+    'ColorData',uint8(255*[1; 1; 1; .9]))
 
 % add axis for comparison of predicted profiles
-axmP   = axm.Position;
-axProf = axes('Parent',fh,'Position',axmP);
-demo_sfwbProf(axProf,r2o)
-linkaxes([axm axProf],'y')
-yticklabels(axProf,(1:10)*r2o)
+% axmP   = axm.Position;
+% axProf = axes('Parent',fh,'Position',axmP);
+% linkaxes([axm axProf],'y')
 
 % adjust label position
 off_r = 0.02;
 ylh1 = ylabel(axm,'|z|/z_0','fontsize',18);
-xlh1 = xlabel(axm,'(b): q/u_*','fontsize',18);
-ylh2 = ylabel(axProf,'|z|/L','fontsize',18);
-xlh2 = xlabel(axProf,['(c): Temp - Temp_{SLD} [',char(0176),'C]'],...
-                     'fontsize',18);
+xlh1 = xlabel(axm,'q/u_*','fontsize',18);
 xlh1.Units = 'Normalized';
-xlh2.Units = 'Normalized';
 ylh1.Units = 'Normalized';
-ylh2.Units = 'Normalized';
-axm.Position    = axm.Position    + off_r*[1 1 -1 -2];
-axProf.Position = axProf.Position + off_r*[1 1 -1 -2];
+axm.Position = axm.Position + off_r*[1 1 0 -2];
 set(xlh1,'Position',xlh1.Position + [0 -off_r 0]);
-set(xlh2,'Position',xlh2.Position + [0  off_r 0]);
-set(ylh2,'Position',ylh2.Position + [off_r 0  0]); 
 
 end
 

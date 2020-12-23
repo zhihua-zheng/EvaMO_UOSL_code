@@ -1,17 +1,26 @@
-function [gradT,PTfit] = get_fit_gdT(depth,iD,PTprof,BLD,nFit,ishow)
+function [gradT,PTfit,itype] = get_fit_gdT(depth,iD,PTprof,BLD,nFit,ishow)
 
 %% Pre-setting
 
 lnz = log(depth);
 [~,ntm] = size(PTprof);
 
-rfit = [0.1 0.3];
+if iD < 3
+    rfit = [0.1 0.3];
+else
+    rfit = [0.2 0.3];
+end
+
 Dfit = BLD*rfit;
 SLD  = BLD*0.2;
 nL   = find(depth < max(SLD),1,'last');
 
 gradT = nan(nL,ntm);
 PTfit = nan(nL,ntm);
+itype = zeros(1,ntm); % id for fitting type
+% itype = 0, insufficient data points
+% itype = 1, fit is not robust
+% itype = 2, successful fit
 
 %% Second-order polynomial fit of profile in depth range [0, 0.3H]
 
@@ -29,7 +38,7 @@ for j = 1:ntm
     %% loop for regressions with varying points
 
     if nPTinSL >= nFit
-   
+        
         p   = cell(1,nr);
         gof = cell(1,nr);
         pTex     = nan(3,nr);
@@ -37,42 +46,44 @@ for j = 1:ntm
         Imono    = zeros(1,nr);
         I2mono   = zeros(1,nr);
         Isense   = zeros(1,nr);
+        Ismall   = zeros(1,nr);
         
         for ir = 1:nr
-        
-        Ifit = ~isnan(PTprof(1:m(ir),j));
-        
-        if sum(Ifit) >= 3
-        [p{ir},gof{ir}] = fit(lnz(Ifit),PTprof(Ifit,j),'poly2');
+            Ifit = ~isnan(PTprof(1:m(ir),j));
 
-        % examine extrapolation accuracy
-        pTex(:,ir) = p{ir}(lnz(m(ir):m(ir)+2));
-        rms_pTex(ir) = rms(pTex(:,ir) - PTprof(m(ir):m(ir)+2,j));
+            if sum(Ifit) >= 3
+                [p{ir},gof{ir}] = fit(lnz(Ifit),PTprof(Ifit,j),'poly2');
 
-        % examine the gradient change for the fitting function
-        dz   = 0.1;
-        zref = log(depth(1):dz:depth(m(ir)));
-        dpT  = diff(p{ir}(zref),1);
-        d2pT = diff(p{ir}(zref),2);
-        ieG  = abs(dpT)  >= 1e-7; % ignore the sign of small dT/dz
-        i2eG = abs(d2pT) >= 1e-8; % ignore the sign of small d2T/dz2
-        sign_dpT  = sign(dpT(ieG));
-        sign_d2pT = sign(d2pT(i2eG));
-        Imono(ir)  = length(unique(sign_dpT))  == 1;
-        I2mono(ir) = length(unique(sign_d2pT)) == 1;
-        Isense(ir) = gof{ir}.adjrsquare > 0.5;
+                % examine extrapolation accuracy
+                pTex(:,ir) = p{ir}(lnz(m(ir):m(ir)+2));
+                rms_pTex(ir) = rms(pTex(:,ir) - PTprof(m(ir):m(ir)+2,j));
+
+                % examine the gradient change of the fitting function
+                dz   = 0.1;
+                zref = log(depth(1):dz:depth(m(ir)));
+                dpT  = diff(p{ir}(zref),1);
+                d2pT = diff(p{ir}(zref),2);
+                ieG  = abs(dpT)  >= 1e-7; % ignore the sign of small dT/dz
+                i2eG = abs(d2pT) >= 1e-8; % ignore the sign of small d2T/dz2
+                sign_dpT  = sign(dpT(ieG));
+                sign_d2pT = sign(d2pT(i2eG));
+                Imono(ir)  = length(unique(sign_dpT))  == 1;
+                I2mono(ir) = length(unique(sign_d2pT)) == 1;
+                Isense(ir) = gof{ir}.adjrsquare > 0.5;
+                Ismall(ir) = gof{ir}.rmse < 2e-3;
+            end
         end
         
-        end
-        
-        % best fit: min rmse, second-order monotonic function
-        imono = find(Imono & I2mono & Isense);
-        if isempty(imono)
+        % good fit: monotonic in second-order, large r2, small rmse
+        igood = find(Imono & I2mono & Isense & Ismall);
+        if isempty(igood)
+            itype(j) = 1;
             continue
         end
         
-        [~,iminO] = min(cellfun(@(A) A.rmse,gof(imono)));
-        bestR = imono(iminO);
+        % best fit: miminum rmse
+        [~,ibest] = min(cellfun(@(A) A.rmse,gof(igood)));
+        bestR = igood(ibest);
         M     = m(bestR);
         P     = p{bestR};
         Gof   = gof{bestR};
@@ -81,29 +92,26 @@ for j = 1:ntm
         b = [p{bestR}.p1 p{bestR}.p2 p{bestR}.p3];
         
         %% compute vertical gradient & fitted temperature
-        
-        if  Gof.rmse <= 2e-3
-            
-            % close to SL base, gradient is small, susceptible to error
-            nGrad   = min([M-1 iSLDj]);
-            Ieva    = depth(1:nGrad) > depth(1);
-            d_eva   = depth(Ieva);
-            lnz_eva = log(d_eva);
-            gradT(Ieva,j) = -(2*b(1)*lnz_eva + b(2)) ./ d_eva;
-            
-            % fitted profile in surface layer
-            PTfit(1:iSLDj,j) = P(lnz(1:iSLDj));
-            
-            % visualize polynomial regression
-            if ishow
-                show_polyfit_lnz;
-            
-            % Figure 3 is from the SPURS-I dataset with j = 3427
-            elseif iD == 2 && j == 3427
-                show_polyfit_lnz;
-            end
-        end
-                
+                    
+        % close to SL base, gradient is small, susceptible to error
+        nGrad   = min([M-1 iSLDj]);
+        Ieva    = depth(1:nGrad) > depth(1);
+        d_eva   = depth(Ieva);
+        lnz_eva = log(d_eva);
+        gradT(Ieva,j) = -(2*b(1)*lnz_eva + b(2)) ./ d_eva;
+
+        % fitted profile in surface layer
+        PTfit(1:iSLDj,j) = P(lnz(1:iSLDj));
+        itype(j) = 2;
+
+        % visualize polynomial regression
+        if ishow
+            show_polyfit_lnz;
+
+        % Figure 3 is from the SPURS-I dataset with j = 3427
+        elseif iD == 2 && j == 3427
+            show_polyfit_lnz;
+        end                
     end
 end
 

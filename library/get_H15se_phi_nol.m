@@ -4,7 +4,7 @@ function [phiS,phiM,TKE] = get_H15se_phi_nol(zeta,etaX,etaY,fzS,mop)
 %==========================================================================
 %
 % USAGE:
-%  [phiS,phiM] = get_H15se_phi_nol(zeta,etaX,etaY,fzS,mop)
+%  [phiS,phiM,TKE] = get_H15se_phi_nol(zeta,etaX,etaY,fzS,mop)
 %
 % DESCRIPTION:
 %  Compute Monin-Obukhov similarity functions for scalars and momentum
@@ -56,7 +56,7 @@ Z2 =  3*A2;
 Z1 = (6*A1 + 3*A2*(1-C2));
 
 T6 =  9*A1;
-T5 =  6*A1; % differs in Harcourt 2013
+T5 =  6*A1; % different than that in Harcourt 2013
 T4 =  3*A2*(1-C2);
 T3 = (6*A1 + 3*A2);
 T2 =  3*A1;
@@ -90,7 +90,7 @@ end
 
 if nFzS == 1
     fzS = repmat(fzS,size(zeta));   
-elseif nFzS ~= nZet  
+elseif nFzS ~= nZet
     disp('Unable to interpret surface proximity function ...')
     disp('Please check input dimension!')
     return
@@ -98,6 +98,10 @@ end
 
 phiM = nan(size(zeta));
 phiS = nan(size(zeta));
+TKE.uu = nan(size(zeta));
+TKE.vv = nan(size(zeta));
+TKE.ww = nan(size(zeta));
+TKE.qq = nan(size(zeta));
 
 switch mop
     case 1
@@ -152,10 +156,11 @@ for j = 1:nZet
         phiM(j) = P(1);
         phiS(j) = P(2);
         
-        % normalized TKE components (\gamma = pi/2)
+        % normalized TKE components (gamma = pi/2, LC aligned with wind)
         TKE.uu(j) = P(3)^2*r + T5/P(3)*P(1);
         TKE.vv(j) = P(3)^2*r - T5/P(3)*(etX - tX);
         TKE.ww(j) = P(3)^2*r - T5/P(3)*(zt + tX);
+        TKE.qq(j) = P(3)^2;
     end
 end
 

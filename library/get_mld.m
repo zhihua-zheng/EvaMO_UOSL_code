@@ -4,21 +4,21 @@ function [mld,Ilast] = get_mld(A,z,flag,avar)
 %==========================================================================
 %
 % USAGE:
-%  mld = get_mld(A,z,flag,z_ref)
+%  mld = get_mld(A,z,flag,z_ref,avar)
 %
 % DESCRIPTION:
-%  Compute the mixed layer depth from the density, temperature, or bulk 
-%   Richardson number profile.
+%  Compute mixed layer depth from the profile of density, temperature, or
+%   bulk Richardson number.
 %
 % INPUT:
 %
-%  A - 2-D matrix (z,t) containing density, temperature or Rib profiles
-%  z - 1-D column vector, vertical coordinates for profiles, bottom up
-%      [-, m]
+%  A - 2-D matrix (z,t), density, temperature or Rib profiles
+%  z - 1-D vector (z,1), vertical coordinates of profiles, 
+%       bottom up [-, m]
 %  flag - 1 density criteria (de Boyer Montégut et al. 2004)
 %         2 temperature criteria (de Boyer Montégut et al. 2004)
 %         3 bulk Richardson number criteria
-%  avar - reference depth (-1/-10) or, critical bulk Richardson number
+%  avar - reference depth (-1 or -10) or, critical bulk Richardson number
 %     
 % OUTPUT:
 %
@@ -39,19 +39,17 @@ switch flag
         end
         
         % Get reference values
-        sigma_ref = zeros(1,ntm);
+        sigma_ref = nan(1,ntm);
         for j = 1:ntm
             goodi = ~isnan(sigma(:,j));
-            if sum(goodi) < 2
-                sigma_ref(j) = NaN;
-            else
+            if sum(goodi) > 1
                 sigma_ref(j) = interp1(z(goodi),sigma(goodi,j),avar,'linear','extrap');
             end
         end
 
         % MLD is where the density is 0.03 kg/m^3 higher than
-        % a surface reference value at 10 m (see de Boyer Montégut et al.
-        % 2004), or at 1 m (considering shallow surface layer)   
+        % a surface reference value at 10 m (de Boyer Montégut et al. 2004),
+        % or at 1 m (considering shallow surface layer)   
         dval = sigma_ref + 0.03;
         where_mld = sigma - repmat(dval,nz,1);
     
@@ -69,7 +67,7 @@ switch flag
             end
         end
 
-        % MLD as the shallowest depth where the temp. is 0.2 C colder than
+        % MLD is where the temperature is 0.2 C colder/warmer than
         % a surface reference value at 10 m (de Boyer Montégut et al. 2004),
         % or at 1 m (considering shallow surface layer)   
         dval = temp_ref - 0.2;
@@ -82,7 +80,6 @@ switch flag
 end
   
 %% interpolate to find where the zero is
-
 mld   = zeros(ntm,1);
 Ilast = zeros(ntm,1);
 
